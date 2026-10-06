@@ -1,0 +1,14 @@
+{
+  "name": "ma-tirelire",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Ma tirelire : budget mensuel simple (périodes du 16 au 15) et suivi du livret A. Une seule page, hors ligne, sans serveur.",
+  "scripts": {
+    "build": "node scripts/build.mjs final && node scripts/build.mjs preview",
+    "build:final": "node scripts/build.mjs final",
+    "build:preview": "node scripts/build.mjs preview",
+    "test": "node scripts/build.mjs preview && node scripts/build.mjs final && node tests/run-all.cjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": { "jsdom": "^30.1.2" }
+}

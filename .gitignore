@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+# JAMAIS de données personnelles dans ce dépôt (il est public) :
+*configuration*.txt
+*sauvegarde*.txt
+config-perso*
+*.perso.*
+.env

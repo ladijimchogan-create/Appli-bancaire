@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EDE7FF">
+<meta name="color-scheme" content="light dark">
+<title>Ma tirelire</title>
+<!--HEAD_EXTRA-->
+<style>
+/*FONTS*/
+:root{
+  --bg:#EDE7FF; --card:#FFFFFF; --field:#F4F0FF; --ink:#2B2350; --muted:#5A4D93;
+  --bubble:#E6DEFF; --track:#EEE9FF; --chip:#EDE7FF;
+  --hl:rgba(255,255,255,.95); --sh-in:rgba(43,35,80,.07); --sh-out:rgba(92,70,190,.16);
+  --mint:#35C9A8; --orange:#FF9F43; --sun:#FFD84D; --coral:#FF8796; --on:#2B2350;
+  --plus:#0F7A64; --minus:#B3263B;
+  --c-fixe:#E4EBFF; --c-courante:#DDF5EC; --c-plaisir:#FFEADD; --dash2:rgba(43,35,80,.12);
+  --ff-head:'Fredoka',ui-rounded,system-ui,sans-serif;
+  --ff-body:'Nunito',ui-rounded,system-ui,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#17132F; --card:#262051; --field:#1E1A42; --ink:#F3F0FF; --muted:#B9B0F0;
+    --bubble:#352E69; --track:#1E1A42; --chip:#352E69;
+    --hl:rgba(255,255,255,.14); --sh-in:rgba(0,0,0,.25); --sh-out:rgba(0,0,0,.4);
+    --plus:#5FE3CC; --minus:#FF9AA8;
+    --c-fixe:#2D3566; --c-courante:#1E4944; --c-plaisir:#4E3140; --dash2:rgba(255,255,255,.14);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17132F; --card:#262051; --field:#1E1A42; --ink:#F3F0FF; --muted:#B9B0F0;
+  --bubble:#352E69; --track:#1E1A42; --chip:#352E69;
+  --hl:rgba(255,255,255,.14); --sh-in:rgba(0,0,0,.25); --sh-out:rgba(0,0,0,.4);
+  --plus:#5FE3CC; --minus:#FF9AA8;
+  --c-fixe:#2D3566; --c-courante:#1E4944; --c-plaisir:#4E3140; --dash2:rgba(255,255,255,.14);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:600 16px/1.45 var(--ff-body);-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3,p{margin:0}
+
+.app{max-width:480px;margin:0 auto;padding:18px 16px 124px;display:flex;flex-direction:column;gap:16px}
+.demo{max-width:480px;margin:0 auto;padding:12px 16px 0}
+.demo>div{background:var(--card);border:2px dashed var(--muted);border-radius:18px;padding:10px 12px;font-size:13px;line-height:1.5}
+.demo input{height:34px;border:0;border-radius:10px;background:var(--field);padding:0 8px;margin:0 4px}
+
+.mbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rb{width:48px;height:48px;border:0;border-radius:50%;background:var(--card);color:var(--ink);display:grid;place-items:center;box-shadow:inset 0 -5px 0 var(--sh-in),inset 0 4px 0 var(--hl),0 10px 20px var(--sh-out);flex:none}
+.rb:active{transform:translateY(2px)}
+.rb[aria-disabled=true]{opacity:.3}
+.mt{flex:1;text-align:center}
+.mt b{display:block;font:600 27px/1.05 var(--ff-head)}
+.mt small{display:block;margin-top:2px;font-size:13px;font-weight:800;color:var(--muted)}
+
+.card{background:var(--card);border-radius:34px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:inset 0 -7px 0 var(--sh-in),inset 0 5px 0 var(--hl),0 14px 28px var(--sh-out)}
+.hrow{display:flex;align-items:center;gap:10px}
+.hrow>svg{flex:none}
+.bubble{flex:1;position:relative;background:var(--bubble);border-radius:24px;padding:12px 14px;font:600 20px/1.2 var(--ff-head)}
+.bubble::before{content:'';position:absolute;left:-6px;top:50%;width:16px;height:16px;background:var(--bubble);transform:translateY(-50%) rotate(45deg);border-radius:4px}
+.gauge{display:flex;gap:6px}
+.seg{height:28px;border-radius:999px;background:var(--track);padding:4px;box-shadow:inset 0 3px 0 var(--sh-in)}
+.seg i{display:block;height:100%;border-radius:999px;background:var(--mint);box-shadow:inset 0 -4px 0 rgba(0,0,0,.13),inset 0 3px 0 rgba(255,255,255,.45)}
+.glab{display:flex;gap:6px;margin-top:8px;font-size:13px;font-weight:800;color:var(--muted)}
+.meta{font-size:14px;font-weight:700;color:var(--muted)}
+.sub{font-size:16px;font-weight:700}
+.tip{padding:10px 12px;border-radius:16px;background:var(--field);font-size:14px;font-weight:700}
+.warn{padding:10px 12px;border-radius:16px;background:var(--coral);color:var(--on);font-size:14px;font-weight:800}
+.note .link{padding:0}
+.note{padding:10px 14px;border-radius:16px;background:var(--card);border:2px dashed var(--muted);font-size:14px;font-weight:700}
+.okrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ok{display:inline-flex;align-items:center;gap:8px;font-weight:800;color:var(--plus)}
+
+.btn-main{min-height:58px;width:100%;border:0;border-radius:22px;background:var(--orange);color:var(--on);font:600 20px/1 var(--ff-head);display:flex;align-items:center;justify-content:center;gap:10px;padding:0 18px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.14),inset 0 4px 0 rgba(255,255,255,.4),0 10px 18px rgba(255,159,67,.35)}
+.btn-main:active{transform:translateY(3px)}
+.btn-ghost,.btn-danger{min-height:52px;width:100%;border:0;border-radius:20px;background:var(--chip);color:var(--ink);font:600 18px/1 var(--ff-head);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;margin-top:10px;box-shadow:inset 0 -4px 0 var(--sh-in)}
+.btn-danger{background:var(--coral);color:var(--on)}
+.link{background:none;border:0;padding:8px 0;font:800 15px var(--ff-body);text-decoration:underline;color:inherit}
+
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.sec-h h2{font:600 19px/1.15 var(--ff-head)}
+.sec-h small{display:block;font:700 13px var(--ff-body);color:var(--muted)}
+.big{font:700 34px/1 var(--ff-head)}
+.list{display:flex;flex-direction:column;gap:6px}
+.pay,.xrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;padding:6px 0;border-radius:16px}
+.xrow{border-radius:0}
+.pay:active,.xrow:active{background:var(--field)}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:600 16px var(--ff-head);color:var(--on);flex:none}
+.av.alt{background:var(--chip);color:var(--ink)}
+.nm{flex:1;min-width:0}
+.nm b{display:block;font-weight:800;overflow-wrap:anywhere}
+.nm small{font-size:13px;font-weight:700;color:var(--muted)}
+.am{font:600 20px var(--ff-head);white-space:nowrap}
+.xrow{padding:10px 0;border-top:2px dashed var(--track)}
+.xrow:first-of-type{border-top:0}
+.empty{font-size:15px;color:var(--muted);font-weight:700;padding:4px 0}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.chips-l{font-size:13px;font-weight:800;color:var(--muted)}
+.chip{min-height:40px;padding:0 14px;border:0;border-radius:999px;background:var(--chip);color:var(--ink);font:800 14px var(--ff-body)}
+.chip[aria-pressed=true]{background:var(--sun);color:var(--on);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.grp{display:flex;align-items:center;gap:10px;margin-top:8px}
+.gi{width:36px;height:36px;border-radius:50%;background:var(--chip);display:grid;place-items:center;flex:none}
+.gname{flex:1;font:600 17px/1.1 var(--ff-head)}
+.gname small{display:block;font:700 12px var(--ff-body);color:var(--muted);margin-top:1px}
+.gtot{font:600 18px var(--ff-head)}
+
+.page-title{font:600 30px/1.05 var(--ff-head);margin:4px 2px 0}
+.lead{margin:0 2px;color:var(--muted);font-size:15px;font-weight:700}
+.jarbox{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:center}
+.jarbox svg{width:100%;height:auto;display:block}
+.bal-l{color:var(--muted);font-size:14px;font-weight:700}
+.bal{font:700 38px/1.05 var(--ff-head)}
+.bal.neg{color:var(--minus)}
+.bar{height:18px;border-radius:999px;background:var(--track);padding:3px;margin:10px 0 6px;box-shadow:inset 0 3px 0 var(--sh-in)}
+.bar i{display:block;height:100%;border-radius:999px;background:var(--mint)}
+.hrow2{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:2px dashed var(--track)}
+.hrow2:first-child{border-top:0}
+.plus{color:var(--plus)} .minus{color:var(--minus)}
+.setline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0}
+.setline label{flex:1;font-weight:800}
+.setline small{display:block;font-weight:700;color:var(--muted);font-size:13px}
+.nin{width:116px;height:48px;border:0;border-radius:16px;background:var(--field);padding:0 12px;text-align:right;font:600 20px var(--ff-head);box-shadow:inset 0 3px 0 var(--sh-in)}
+.fld-l{font-weight:800;margin:14px 0 8px}
+.acc{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;border:0;border-radius:20px;background:var(--field);padding:0 14px;font:600 18px var(--ff-head);text-align:left}
+.acc .cnt{margin-left:auto;min-width:30px;height:30px;padding:0 8px;border-radius:999px;background:var(--sun);color:var(--on);display:grid;place-items:center;font:700 15px var(--ff-head)}
+.acc .chev{display:inline-grid;transition:transform .2s}
+.acc[aria-expanded=true] .chev{transform:rotate(180deg)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tile{display:flex;align-items:center;gap:10px;min-height:56px;min-width:0;border:0;border-radius:20px;background:var(--field);padding:6px 10px;text-align:left;font-weight:800}
+.tile .av{width:38px;height:38px;font-size:14px}
+.tile .cn{min-width:0;overflow-wrap:anywhere;font-size:15px;line-height:1.2}
+.clist{display:flex;flex-direction:column;gap:8px;max-height:270px;overflow-y:auto;padding:2px}
+.ctile{display:flex;align-items:center;min-height:56px;border-radius:20px;background:var(--field)}
+.ctile.on{background:var(--sun);color:var(--on);box-shadow:inset 0 -4px 0 rgba(0,0,0,.1)}
+.cbtn{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:56px;border:0;background:none;padding:6px 6px 6px 8px;text-align:left;font-weight:800;border-radius:20px}
+.cbtn .cn{flex:1;min-width:0;overflow-wrap:anywhere}
+.cx{width:44px;height:44px;flex:none;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;opacity:.75}
+.cspecial{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ctile.sp{width:100%;gap:12px;padding:6px 12px;border:2px dashed var(--muted);background:transparent;text-align:left;font-weight:800}
+.ctile.sp.on{border-color:transparent;background:var(--sun)}
+.ctile.sp .cn{flex:1}
+.addcl{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:20px;background:var(--field)}
+.addcl input{min-height:50px;border:0;border-radius:16px;background:var(--card);padding:0 14px;font:700 18px var(--ff-body)}
+.addcl .btn-main{margin-top:0}
+.confirm{padding:14px;border-radius:22px;background:var(--field)}
+.confirm .two{display:flex;gap:10px;margin-top:10px}
+.confirm .two button{margin-top:0}
+.foot{text-align:center;color:var(--muted);font-size:13px;font-weight:700}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;padding:0 16px calc(12px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.tabs-in{pointer-events:auto;display:flex;gap:6px;width:100%;max-width:448px;background:var(--card);border-radius:30px;padding:8px;box-shadow:inset 0 -5px 0 var(--sh-in),inset 0 4px 0 var(--hl),0 12px 24px var(--sh-out)}
+.tab{flex:1;height:56px;border:0;border-radius:24px;background:transparent;color:var(--muted);font:600 14px var(--ff-head);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tab[aria-current=page]{background:var(--sun);color:var(--on);box-shadow:inset 0 -4px 0 rgba(0,0,0,.1)}
+
+.sheet-wrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:absolute;inset:0;background:rgba(20,16,50,.55)}
+.sheet{position:relative;width:100%;max-width:480px;max-height:92vh;max-height:92dvh;overflow:auto;background:var(--card);border-radius:32px 32px 0 0;padding:12px 18px calc(24px + env(safe-area-inset-bottom,0px));animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.grab{width:46px;height:6px;border-radius:99px;background:var(--track);margin:0 auto 12px}
+.sheet h2{font:600 24px/1.1 var(--ff-head);margin-bottom:4px}
+.sheet p{margin:8px 0;font-size:15px}
+.fld{display:block;margin:14px 0 0;font-weight:800}
+.fld input:not([type=checkbox]),.fld textarea{display:block;width:100%;margin-top:6px;min-height:54px;padding:0 14px;border:0;border-radius:18px;background:var(--field);font:700 18px var(--ff-body);box-shadow:inset 0 3px 0 var(--sh-in)}
+.fld textarea{padding:10px 14px;font:600 13px/1.35 ui-monospace,Menlo,Consolas,monospace;min-height:110px}
+.fld .chips{margin-top:8px}
+.hint{color:var(--muted);font-size:14px;font-weight:700;min-height:20px}
+.err{color:var(--minus);font-weight:800;min-height:22px}
+.chk{display:flex;align-items:flex-start;gap:12px;margin:16px 0 4px;font-weight:800}
+.chk input{width:28px;height:28px;accent-color:var(--orange);flex:none}
+.chk small{display:block;font-weight:700;color:var(--muted);font-size:13px}
+.sheet .btn-main{margin-top:12px}
+
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:800;max-width:90vw;text-align:center}
+.pop{position:fixed;left:50%;top:50%;z-index:70;width:14px;height:14px;border-radius:50%;background:var(--c);pointer-events:none;animation:pop 1.1s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes pop{from{transform:translate(0,0) scale(.6);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(40deg) scale(1.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.catblk{border-radius:24px;padding:10px 14px 4px}
+.catblk.c-fixe{background:var(--c-fixe)}
+.catblk.c-courante{background:var(--c-courante)}
+.catblk.c-plaisir{background:var(--c-plaisir)}
+.catblk .grp{margin-top:0;padding-bottom:4px}
+.catblk .gi{background:var(--card)}
+.catblk .xrow{border-top:2px dashed var(--dash2)}
+.catblk .xrow:first-of-type{border-top:0}
+.catblk .nm small{color:var(--muted)}
+.mvbox{display:flex;flex-direction:column;gap:6px;padding:10px 14px;border-radius:18px;background:var(--field)}
+.mvrow{display:flex;justify-content:space-between;gap:10px;font-weight:800}
+.mvrow b{font:600 18px var(--ff-head)}
+.fld select{display:block;width:100%;margin-top:6px;min-height:54px;padding:0 14px;border:0;border-radius:18px;background:var(--field);font:700 18px var(--ff-body);color:var(--ink);box-shadow:inset 0 3px 0 var(--sh-in)}
+.welcome{display:flex;flex-direction:column;gap:14px;align-items:stretch;text-align:center;padding-top:8px}
+.welcome .pigbox{display:flex;justify-content:center}
+.welcome h1{font:600 32px/1.05 var(--ff-head)}
+.welcome p{font-size:16px;font-weight:700}
+.welcome .fld{text-align:left}
+.badge{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;background:var(--sun);color:var(--on);font:700 12px var(--ff-body)}
+</style>
+</head>
+<body>
+<div class="demo" id="demo"></div>
+<main class="app" id="app"></main>
+<nav class="tabs" aria-label="Navigation"><div class="tabs-in" id="tabs"></div></nav>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+'use strict';
+const DEMO = __DEMO__;
+const KEY = 'ma-tirelire-v2';
+const FIRST = '2026-10';   // utilisé seulement pour les données d'exemple de l'aperçu
+const MAX_BACK = 24;       // mois d'historique autorisés avant le début du suivi
+
+/* ---------- Outils ---------- */
+const CATS = {
+  fixe:     { label:'Obligatoires', hint:'Ce qui part tous les mois', icon:'home' },
+  courante: { label:'Du quotidien', hint:'Carburant, courses…',       icon:'cart' },
+  plaisir:  { label:'Plaisir',      hint:'Abonnements, sorties…',     icon:'star' }
+};
+const ICONS = {
+  home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  cart:'<path d="M3 4h2l2.2 11h10.6l2-8H6.2"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  left:'<path d="M15 5l-7 7 7 7"/>', right:'<path d="M9 5l7 7-7 7"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  jar:'<path d="M8 3h8M9 3v3M15 3v3M6 9a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>'
+};
+const ico = (n, s = 22, w = 2.6) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+const uid = () => Math.random().toString(36).slice(2, 9);
+const r2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+const sum = list => r2(list.reduce((a, x) => a + (x.amount || 0), 0));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = (sel, root = document) => root.querySelector(sel);
+function fmt(n) {   // « 1 234,56 € » : l'espace des milliers est écrit à la main, il ne dépend pas du téléphone
+  n = r2(n); const neg = n < 0, a = Math.abs(n);
+  const [ip, dp] = a.toFixed(2).split('.');
+  return (neg ? '−' : '') + ip.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + (dp === '00' ? '' : ',' + dp) + '\u00a0€';
+}
+const toField = n => (n == null ? '' : String(n).replace('.', ','));
+function parseAmount(s) {
+  if (s == null) return null;
+  s = String(s).replace(/[\s\u00a0\u202f€]/g, '').replace(',', '.');
+  if (s === '') return null;
+  const n = parseFloat(s);
+  return isFinite(n) && n >= 0 ? r2(n) : null;
+}
+const clone = o => JSON.parse(JSON.stringify(o));
+const normName = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const cleanName = raw => String(raw || '').trim().replace(/\s+/g, ' ');
+
+/* ---------- Dates et périodes (du 16 au 15) ---------- */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+let demoDate = '2026-10-24';
+const todayStr = () => (DEMO ? demoDate : ymd(new Date()));
+const keyOf = (y, m) => y + '-' + pad(m);
+function shiftKey(k, n) { const [y, m] = k.split('-').map(Number); const t = new Date(y, m - 1 + n, 1); return keyOf(t.getFullYear(), t.getMonth() + 1); }
+function periodOf(s) { const [y, m, d] = s.split('-').map(Number); return d >= 16 ? keyOf(y, m) : shiftKey(keyOf(y, m), -1); }
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const mName = k => { const [y, m] = k.split('-').map(Number); return new Intl.DateTimeFormat('fr-FR', { month:'long' }).format(new Date(y, m - 1, 1)); };
+const dd = s => { const [y, m, d] = s.split('-').map(Number); return new Intl.DateTimeFormat('fr-FR', { day:'numeric', month:'short' }).format(new Date(y, m - 1, d)); };
+const rangeTxt = k => `${dd(k + '-16')} → ${dd(shiftKey(k, 1) + '-15')}`;
+const de = name => (/^[aeiouhâéèêîôû]/i.test(name) ? 'd’' : 'de ') + name;
+
+/* ---------- Données ---------- */
+function emptyData() {
+  return { v:2, settings:{ min:200, goal:1000, startKey:periodOf(todayStr()), start:0, set:false, started:false, lastBackup:0 },
+    rules:{ inc:[], exp:[] }, clients:[], payments:[], oneoffs:[], periods:{} };
+}
+/*DEMO:BEGIN*/
+function demoData() {   // données d'EXEMPLE, inventées, pour l'aperçu et les tests seulement : retirées de la version finale
+  const d = emptyData();
+  d.settings.startKey = FIRST; d.settings.started = true; d.settings.start = 300; d.settings.set = true;
+  const rule = (name, amount, cat) => ({ id:uid(), name, cat, versions:[{ from:FIRST, amount }], to:null });
+  d.rules.inc.push({ id:uid(), name:'Allocation (exemple)', versions:[{ from:FIRST, amount:100 }], to:null });
+  [['Loyer',800,'fixe'],['Assurance auto',60,'fixe'],['Téléphone',10,'fixe'],['Crédit',130,'fixe'],
+   ['Carburant',50,'courante'],['Streaming',20,'plaisir']].forEach(([n, a, c]) => d.rules.exp.push(rule(n, a, c)));
+  const cli = {};
+  ['Mme Durand', 'M. Lopez', 'Famille Petit', 'Mme Garcia', 'M. Bernard'].forEach(n => { cli[n] = { id:uid(), name:n }; d.clients.push(cli[n]); });
+  d.payments.push({ id:uid(), clientId:cli['Mme Durand'].id, name:'Mme Durand', amount:340, date:'2026-10-18' },
+                  { id:uid(), clientId:cli['M. Lopez'].id, name:'M. Lopez', amount:210, date:'2026-10-21' },
+                  { id:uid(), clientId:cli['Famille Petit'].id, name:'Famille Petit', amount:180, date:'2026-10-23' });
+  return d;
+}
+/*DEMO:END*/
+let storageOK = true;
+try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); } catch (e) { storageOK = false; }
+const validShape = d => d && typeof d === 'object' && d.v === 2 && d.settings && d.rules && Array.isArray(d.rules.inc) && Array.isArray(d.rules.exp) && Array.isArray(d.payments) && d.periods && typeof d.periods === 'object';
+function migrate(d) {   // les anciennes données sont converties ici, sans rien effacer
+  if (!d || d.v !== 2) return d;
+  if (!Array.isArray(d.clients)) {
+    d.clients = []; const byN = new Map();
+    (d.payments || []).forEach(p => {
+      const n = String(p.name || '').trim(); if (!n) return;
+      const key = normName(n);
+      if (!byN.has(key)) { const c = { id:uid(), name:n }; byN.set(key, c); d.clients.push(c); }
+      p.clientId = byN.get(key).id;
+    });
+  }
+  if (!Array.isArray(d.oneoffs)) d.oneoffs = [];
+  d.settings = d.settings || {};
+  if (d.settings.started === undefined) d.settings.started = true;
+  Object.keys(d.periods || {}).forEach(k => {
+    const P = d.periods[k]; P.ov = P.ov || {};
+    (P.extra || []).forEach(e => d.oneoffs.push({ id:e.id, name:e.name, amount:e.amount, cat:e.cat, date:k + '-16' }));
+    P.extra = [];
+    if (P.done && P.done.snap && P.done.snap.exp) P.done.snap.exp.forEach(l => { if (!l.rule && !l.date) l.date = k + '-16'; });
+    if (!Array.isArray(P.moves)) {
+      P.moves = [];
+      if (P.done && (P.done.saved || P.done.drawn)) P.moves.push({ id:uid(), amount:r2((P.done.saved || 0) - (P.done.drawn || 0)), at:P.done.at || 0 });
+    }
+  });
+  return d;
+}
+function applyConfig(c) {   // « configuration de départ » : dépenses, revenus et clients, sans aucune date
+  const k = periodOf(todayStr()), d = emptyData();
+  d.settings.startKey = k; d.settings.started = true;
+  if (c.settings) { d.settings.min = parseAmount(c.settings.min) ?? 200; d.settings.goal = parseAmount(c.settings.goal) ?? 1000; }
+  (c.incomes || []).forEach(i => d.rules.inc.push({ id:uid(), name:cleanName(i.name).slice(0, 40), versions:[{ from:k, amount:parseAmount(i.amount) ?? 0 }], to:null }));
+  (c.expenses || []).forEach(e => d.rules.exp.push({ id:uid(), name:cleanName(e.name).slice(0, 40), cat:CATS[e.cat] ? e.cat : 'courante', versions:[{ from:k, amount:parseAmount(e.amount) ?? 0 }], to:null }));
+  (c.clients || []).forEach(n => { const nm = cleanName(typeof n === 'string' ? n : n && n.name).slice(0, 40); if (nm && !d.clients.some(x => normName(x.name) === normName(nm))) d.clients.push({ id:uid(), name:nm }); });
+  return d;
+}
+function load() {
+  try {
+    const raw = storageOK ? localStorage.getItem(KEY) : null;
+    if (raw) { const d = migrate(JSON.parse(raw)); if (validShape(d)) { d.settings = Object.assign(emptyData().settings, d.settings); return d; } }
+  } catch (e) {}
+  return DEMO ? demoData() : emptyData();
+}
+let S = load();
+function persist() { if (!storageOK) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { storageOK = false; } }
+function getP(k) { if (!S.periods[k]) S.periods[k] = { ov:{}, extra:[], moves:[], revealed:false, done:null }; return S.periods[k]; }
+
+/* ---------- Règles automatiques : elles ne comptent qu'à partir de leur mois de départ ---------- */
+const ruleFrom = r => r.versions[0].from;
+const ruleActive = (r, k) => ruleFrom(r) <= k && (!r.to || k <= r.to);
+const ruleAmount = (r, k) => { let a = r.versions[0].amount; for (const v of r.versions) if (v.from <= k) a = v.amount; return a; };
+const first = () => S.settings.startKey;                       // premier mois « en direct » : la tirelire démarre ici
+const isHist = k => k < first();                               // mois d'avant le début : pour mémoire, sans effet sur la tirelire
+const minDate = () => shiftKey(first(), -MAX_BACK) + '-16';
+function minKey() {
+  let m = first(); const upd = k => { if (k < m) m = k; };
+  S.payments.forEach(p => upd(periodOf(p.date))); S.oneoffs.forEach(e => upd(periodOf(e.date)));
+  [...S.rules.inc, ...S.rules.exp].forEach(r => upd(ruleFrom(r)));
+  Object.keys(S.periods).forEach(k => { const P = S.periods[k]; if (P.done || P.moves.length) upd(k); });
+  return m;
+}
+
+function liveLines(k) {
+  const P = getP(k), inc = [], exp = [];
+  const take = (rules, out, withCat) => rules.forEach(r => {
+    if (!ruleActive(r, k)) return;
+    const o = P.ov[r.id] || {};
+    if (o.removed) return;
+    const line = { id:r.id, rule:true, name:r.name, amount:(o.amount != null ? o.amount : ruleAmount(r, k)) };
+    if (withCat) line.cat = r.cat;
+    out.push(line);
+  });
+  take(S.rules.inc, inc, false);
+  take(S.rules.exp, exp, true);
+  S.oneoffs.filter(e => periodOf(e.date) === k).sort((a, b) => (a.date < b.date ? 1 : -1))
+    .forEach(e => exp.push({ id:e.id, rule:false, name:e.name, amount:e.amount, cat:e.cat, date:e.date }));
+  const pays = S.payments.filter(p => periodOf(p.date) === k).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  return { pays, inc, exp };
+}
+const lines = k => { const P = getP(k); return P.done ? P.done.snap : liveLines(k); };
+function calc(k) {
+  const L = lines(k), min = S.settings.min;
+  const pay = sum(L.pays), fixed = sum(L.inc), inc = r2(pay + fixed), dep = sum(L.exp);
+  const reste = r2(inc - dep);
+  return { pay, fixed, inc, dep, reste, libre:min, pioche:r2(Math.max(0, min - reste)), save:r2(Math.max(0, reste - min)) };
+}
+const movedOf = P => r2(P.moves.reduce((a, m) => a + m.amount, 0));
+const balance = () => r2(S.settings.start + r2(Object.values(S.periods).reduce((a, P) => a + movedOf(P), 0)));
+function tirelireModel(k) {   // ce que le mois demande à la tirelire, ce qui y est déjà passé, et ce qu'il reste à faire
+  const c = calc(k), P = getP(k);
+  const target = c.save > 0 ? c.save : c.pioche > 0 ? -c.pioche : 0, moved = movedOf(P);
+  return { c, P, target, moved, rem:r2(target - moved) };
+}
+const ended = k => periodOf(todayStr()) > k;
+const curKey = () => { const k = periodOf(todayStr()); return k < first() ? first() : k; };
+const prevDone = k => k <= first() || !!getP(shiftKey(k, -1)).done;
+const canClose = k => !isHist(k) && ended(k) && prevDone(k);
+const canUndo = k => !!getP(k).done && !getP(shiftKey(k, 1)).done;
+
+/* ---------- Clients ---------- */
+const sortedClients = () => [...S.clients].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity:'base' }));
+function addClient(raw) {
+  const name = cleanName(raw);
+  if (!name) return { ok:false, error:'Écris le nom du client.' };
+  const ex = S.clients.find(c => normName(c.name) === normName(name));
+  if (ex) return { ok:true, client:ex, existing:true };
+  const client = { id:uid(), name }; S.clients.push(client); persist();
+  return { ok:true, client };
+}
+function renameClient(id, raw) {
+  const name = cleanName(raw), c = S.clients.find(x => x.id === id);
+  if (!name) return { ok:false, error:'Écris le nom du client.' };
+  if (!c) return { ok:false, error:'Client introuvable.' };
+  if (S.clients.some(x => x.id !== id && normName(x.name) === normName(name))) return { ok:false, error:'Un client porte déjà ce nom.' };
+  c.name = name;
+  S.payments.forEach(p => { if (p.clientId === id) p.name = name; });
+  Object.values(S.periods).forEach(P => { if (P.done) P.done.snap.pays.forEach(p => { if (p.clientId === id) p.name = name; }); });
+  persist(); return { ok:true };
+}
+function deleteClient(id) { S.clients = S.clients.filter(c => c.id !== id); persist(); }
+
+let view = 'month';
+let vk = curKey();
+let clientsOpen = false;
+let ps = null;   // état de la fenêtre « J'ai reçu un paiement »
+const clampVk = () => { const lo = minKey(); if (vk < lo) vk = lo; if (vk > curKey()) vk = curKey(); };
+
+/* ---------- Dessins ---------- */
+function pig(mood) {
+  const eye = mood === 'sleep'
+    ? '<path d="M72 47 Q78 42 84 47" fill="none" stroke="#2B2350" stroke-width="3.5" stroke-linecap="round"/>'
+    : '<circle cx="78" cy="46" r="3.6" fill="#2B2350"/>';
+  const mouth = mood === 'happy'
+    ? '<path d="M68 67 Q78 80 88 67" fill="none" stroke="#2B2350" stroke-width="3.5" stroke-linecap="round"/>'
+    : mood === 'sleep'
+      ? '<path d="M72 71 L84 71" fill="none" stroke="#2B2350" stroke-width="3.5" stroke-linecap="round"/>'
+      : '<path d="M70 70 Q78 76 86 70" fill="none" stroke="#2B2350" stroke-width="3.5" stroke-linecap="round"/>';
+  const extra = mood === 'happy'
+    ? '<path d="M20 12l2.6 5.8 5.8 2.6-5.8 2.6L20 29l-2.6-6-5.8-2.6 5.8-2.6z" fill="#FFD84D"/><path d="M104 74l1.8 3.8 3.8 1.8-3.8 1.8-1.8 3.8-1.8-3.8-3.8-1.8 3.8-1.8z" fill="#FFD84D"/>'
+    : mood === 'sleep'
+      ? '<text x="96" y="24" font-family="Fredoka,sans-serif" font-weight="700" font-size="17" fill="#8F85D6">z</text><text x="108" y="12" font-family="Fredoka,sans-serif" font-weight="700" font-size="12" fill="#8F85D6">z</text>'
+      : '';
+  return `<svg width="112" height="94" viewBox="0 0 120 100" aria-hidden="true">
+    <rect x="30" y="76" width="14" height="20" rx="6" fill="#FF8FA3" stroke="#2B2350" stroke-width="4"/>
+    <rect x="76" y="76" width="14" height="20" rx="6" fill="#FF8FA3" stroke="#2B2350" stroke-width="4"/>
+    <ellipse cx="58" cy="56" rx="44" ry="32" fill="#FF8FA3" stroke="#2B2350" stroke-width="4"/>
+    <path d="M70 28 L80 8 L94 32 Z" fill="#FF8FA3" stroke="#2B2350" stroke-width="4" stroke-linejoin="round"/>
+    <ellipse cx="98" cy="58" rx="16" ry="12" fill="#FFC1CD" stroke="#2B2350" stroke-width="4"/>
+    <circle cx="94" cy="58" r="2.6" fill="#2B2350"/><circle cx="104" cy="58" r="2.6" fill="#2B2350"/>
+    ${eye}${mouth}
+    <rect x="32" y="26" width="24" height="5" rx="2.5" fill="#2B2350"/>${extra}</svg>`;
+}
+function jarSvg(level) {
+  const top = 26, hgt = 150, fillY = top + hgt - hgt * level;
+  const coins = [[58,160],[92,164],[76,146],[108,150],[50,142]].filter(([, y]) => y > fillY + 6)
+    .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="#FFD84D" stroke="#2B2350" stroke-width="3"/>`).join('');
+  return `<svg viewBox="0 0 160 190" aria-hidden="true"><defs><clipPath id="jc"><rect x="24" y="${top}" width="112" height="${hgt}" rx="34"/></clipPath></defs>
+    <rect x="24" y="${top}" width="112" height="${hgt}" rx="34" fill="var(--field)"/>
+    <g clip-path="url(#jc)"><rect x="20" y="${fillY}" width="120" height="${hgt + 10}" fill="#35C9A8"/><rect x="20" y="${fillY}" width="120" height="6" fill="#8BE9D8"/>${coins}</g>
+    <rect x="24" y="${top}" width="112" height="${hgt}" rx="34" fill="none" stroke="#2B2350" stroke-width="5"/>
+    <rect x="46" y="8" width="68" height="20" rx="9" fill="#FF9F43" stroke="#2B2350" stroke-width="5"/></svg>`;
+}
+const PAL = ['#FFD6A5', '#B8F0E0', '#FFC8DD', '#CDE7FF', '#E3D5FF', '#FFF1A8'];
+const hash = s => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+const initials = n => { const w = String(n || '').trim().split(/\s+/).filter(Boolean); return ((w[0] || '').charAt(0) + (w[1] || '').charAt(0)).toUpperCase() || '€'; };
+
+/* ---------- Écran d'accueil (première ouverture) ---------- */
+function welcomeView() {
+  const t = todayStr(), k = periodOf(t);
+  return `<div class="welcome"><div class="pigbox">${pig('happy')}</div>
+    <h1>Bienvenue !</h1>
+    <p>Ma tirelire t’aide à savoir chaque mois combien mettre de côté, même quand tes paiements arrivent un par un.</p>
+    <section class="card" style="text-align:left"><p class="sub">Ton suivi commence aujourd’hui, le ${dd(t)}, dans la période <b>${cap(mName(k))}</b> (${rangeTxt(k)}).</p>
+      <p class="meta">Tu pourras aussi rentrer des paiements ou des dépenses plus anciens, en changeant leur date.</p>
+      <label class="fld">Combien y a-t-il sur ton livret A ? (facultatif)<input id="w-bal" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <button class="btn-main" data-act="start" style="margin-top:14px">Commencer</button>
+      <button class="link" data-act="config-open" style="text-align:left">J’ai un texte de configuration</button></section></div>`;
+}
+
+/* ---------- Écran « Ce mois-ci » ---------- */
+function heroHtml(k) {
+  const { c, P, target, moved, rem } = tirelireModel(k);
+  const hist = isHist(k), isEnd = ended(k);
+  const pct = x => Math.max(0, Math.min(100, Math.round(x * 100)));
+  const f1 = c.dep > 0 ? Math.min(1, c.inc / c.dep) : (c.inc > 0 ? 1 : 0);
+  const f2 = c.libre > 0 ? Math.min(1, Math.max(0, (c.inc - c.dep) / c.libre)) : (c.inc > c.dep ? 1 : 0);
+  const f3 = c.save > 0 ? 1 : 0;
+  const bal = balance();
+  const blockTip = !prevDone(k) ? '<p class="tip">Valide d’abord le mois précédent pour pouvoir clôturer celui-ci.</p>' : '';
+  const balWarn = need => (S.settings.set
+    ? (need > bal + 0.004 ? `<p class="warn">La tirelire ne contient que ${fmt(Math.max(0, bal))}. Il manquera ${fmt(need - Math.max(0, bal))}.</p>` : '')
+    : '<p class="tip">Dis-moi combien il y a sur ta tirelire (onglet « Ma tirelire ») et je vérifie qu’elle suffit.</p>');
+  let mood = 'calm', bubble = '', extra = '', actions = '';
+
+  // ce que la tirelire doit recevoir ou rendre, et le bouton pour le noter
+  const moveUi = final => {
+    let ex = '', ac = '';
+    if (target >= 0 && (moved !== 0 || rem > 0)) ex += `<div class="mvbox"><div class="mvrow"><span>Déjà mis de côté</span><b>${fmt(Math.max(0, moved))}</b></div><div class="mvrow"><span>Reste à mettre de côté</span><b>${fmt(Math.max(0, rem))}</b></div></div>`;
+    if (rem > 0) ac = `<button class="btn-main" data-act="move">J’ai mis ${fmt(rem)} de côté</button>`;
+    else if (rem < 0 && (final || moved > 0)) {
+      if (target >= 0) { ex += `<p class="warn">Tu as mis ${fmt(-rem)} de trop dans ta tirelire (les chiffres ont changé).</p>`; ac = `<button class="btn-main" data-act="move">J’ai remis ${fmt(-rem)} sur mon compte</button>`; }
+      else { if (moved > 0) ex += `<p class="tip">Tu avais mis ${fmt(moved)} de côté plus tôt : je te propose de le reprendre en même temps.</p>`; ex += balWarn(-rem); ac = `<button class="btn-main" data-act="move">J’ai pris ${fmt(-rem)} dans ma tirelire</button>`; }
+    } else if (rem === 0 && final) ac = blockTip || '<button class="btn-main" data-act="validate">Valider ce mois</button>';
+    if (P.moves.length) ac += '<button class="link" data-act="undo-move">Annuler le dernier mouvement</button>';
+    return { ex, ac };
+  };
+
+  if (hist) {
+    bubble = 'Ce mois est avant ton début. Je le garde pour mémoire.';
+    extra = '<p class="tip">Il ne change pas ta tirelire.</p>';
+  } else if (P.done) {
+    mood = moved > 0 ? 'happy' : 'calm';
+    bubble = moved < 0 ? `Tu as pris ${fmt(-moved)} dans ta tirelire.` : moved > 0 ? `Tu as mis ${fmt(moved)} de côté. Bravo !` : 'Mois validé : pile ce qu’il fallait.';
+    actions = `<div class="okrow"><span class="ok">${ico('check', 20, 3)} Noté dans ta tirelire</span>${canUndo(k) ? '<button class="link" data-act="undo">Annuler</button>' : ''}</div>`;
+  } else if (isEnd && !P.revealed) {
+    bubble = 'Le mois est terminé. On fait le calcul ?';
+    actions = blockTip || '<button class="btn-main" data-act="reveal">Le mois est terminé, calculer</button>';
+  } else if (isEnd) {
+    let sub;
+    if (rem === 0 && moved > 0 && target > 0) { mood = 'happy'; bubble = `Déjà ${fmt(moved)} dans ta tirelire. Bravo !`; sub = `Il te reste ${fmt(c.libre)} libres pour toi.`; }
+    else if (target < 0) {
+      bubble = `Prends ${fmt(c.pioche)} dans ta tirelire`;
+      sub = c.reste < 0 ? `Les dépenses dépassent tes revenus de ${fmt(-c.reste)}. La tirelire couvre ça et te redonne tes ${fmt(c.libre)} libres.`
+                        : `Après tes dépenses, il te reste ${fmt(c.reste)}. La tirelire complète pour que tu aies tes ${fmt(c.libre)} libres.`;
+    } else if (target > 0) { mood = 'happy'; bubble = `Mets ${fmt(c.save)} de côté`; sub = `Dans ta tirelire (livret A). Il te reste ${fmt(c.libre)} libres pour toi.`; }
+    else { bubble = 'Pile ce qu’il faut'; sub = `Rien à mettre de côté, rien à prendre. Tes ${fmt(c.libre)} sont là.`; }
+    const u = moveUi(true); extra = `<p class="sub">${esc(sub)}</p>${u.ex}`; actions = u.ac;
+  } else {
+    if (c.pay === 0) { mood = 'sleep'; bubble = 'Rien reçu pour l’instant. Ajoute ton premier paiement dès qu’il arrive.'; }
+    else if (c.inc < c.dep) bubble = `Encore ${fmt(c.dep - c.inc)} et tes dépenses sont couvertes.`;
+    else if (c.inc < c.dep + c.libre) { mood = 'happy'; bubble = `Dépenses couvertes ! Encore ${fmt(c.dep + c.libre - c.inc)} pour tes ${fmt(c.libre)} libres.`; }
+    else { mood = 'happy'; bubble = rem > 0 ? `Tout est couvert. ${fmt(rem)} à mettre dans la tirelire.` : moved > 0 ? `Tout est couvert, et ${fmt(moved)} sont déjà dans ta tirelire.` : 'Tout est couvert.'; }
+    const u = moveUi(false); extra = u.ex; actions = u.ac;
+  }
+
+  return `<section class="card" aria-live="polite">
+    <div class="hrow">${pig(mood)}<div class="bubble">${esc(bubble)}</div></div>
+    <div><div class="gauge" role="img" aria-label="Avancement du mois">
+      <div class="seg" style="flex:6"><i style="width:${pct(f1)}%"></i></div>
+      <div class="seg" style="flex:2"><i style="width:${pct(f2)}%"></i></div>
+      <div class="seg" style="flex:2"><i style="width:${pct(f3)}%"></i></div></div>
+      <div class="glab"><div style="flex:6">Dépenses couvertes</div><div style="flex:2;text-align:center">${fmt(c.libre)} pour moi</div><div style="flex:2;text-align:right">Tirelire</div></div></div>
+    <p class="meta">Reçu ${fmt(c.inc)} pour ${fmt(c.dep)} de dépenses.</p>
+    ${extra}${actions}</section>`;
+}
+
+function rentreesHtml(k) {
+  const L = lines(k), c = calc(k), locked = !!getP(k).done;
+  const payRows = L.pays.map(p => `<button class="pay" data-act="${locked ? 'locked' : 'edit-pay'}" data-id="${p.id}">
+      <span class="av" style="background:${PAL[hash(p.name || '?') % PAL.length]}">${esc(initials(p.name))}</span>
+      <span class="nm"><b>${esc(p.name || 'Paiement')}</b><small>${dd(p.date)}</small></span><span class="am">+${fmt(p.amount)}</span></button>`).join('');
+  const fixRows = L.inc.map(i => `<button class="pay" data-act="${locked ? 'locked' : 'edit-rule'}" data-inc="1" data-id="${i.id}">
+      <span class="av alt">${ico('cal', 20, 2.4)}</span><span class="nm"><b>${esc(i.name)}</b><small>chaque mois</small></span><span class="am">+${fmt(i.amount)}</span></button>`).join('');
+  const cl = sortedClients();
+  return `<section class="card">
+    <div class="sec-h"><div><h2>Mon salaire ${de(mName(k))}</h2><small>Additionné tout seul à chaque paiement</small></div><div class="big">${fmt(c.pay)}</div></div>
+    <div class="list">${payRows || '<p class="empty">Aucun paiement pour l’instant.</p>'}${fixRows}</div>
+    ${locked ? '' : `<button class="btn-main" data-act="add-pay">${ico('plus')} J’ai reçu un paiement</button>
+    <button class="acc" data-act="toggle-clients" aria-expanded="${clientsOpen}"><span>Mes clients</span><span class="cnt">${cl.length}</span><span class="chev">${ico('chev', 22, 3)}</span></button>
+    ${clientsOpen ? (cl.length ? `<div class="tiles">${cl.map(x => `<button class="tile" data-act="add-pay" data-client="${x.id}"><span class="av" style="background:${PAL[hash(x.name) % PAL.length]}">${esc(initials(x.name))}</span><span class="cn">${esc(x.name)}</span></button>`).join('')}</div>` : '<p class="empty">Aucun client pour l’instant. Touche « J’ai reçu un paiement » pour en ajouter un.</p>') : ''}
+    <button class="link" data-act="add-exp" data-inc="1" style="text-align:left">Ajouter un revenu fixe (chaque mois)</button>`}
+  </section>`;
+}
+
+function depensesHtml(k) {
+  const L = lines(k), c = calc(k), locked = !!getP(k).done;
+  const groups = Object.entries(CATS).map(([key, v]) => {
+    const items = L.exp.filter(e => e.cat === key);
+    if (!items.length) return '';
+    return `<div class="catblk c-${key}"><div class="grp"><span class="gi">${ico(v.icon, 18, 2.4)}</span><div class="gname">${v.label}<small>${v.hint}</small></div><b class="gtot">${fmt(sum(items))}</b></div>
+      <div>${items.map(e => `<button class="xrow" data-act="${locked ? 'locked' : 'edit-exp'}" data-id="${e.id}" data-rule="${e.rule ? 1 : 0}">
+        <span class="nm"><b>${esc(e.name)}</b><small>${e.rule ? 'chaque mois' : e.date ? dd(e.date) : 'une seule fois'}</small></span><span class="am">${fmt(e.amount)}</span></button>`).join('')}</div></div>`;
+  }).join('');
+  return `<section class="card"><div class="sec-h"><div><h2>Mes dépenses</h2><small>Touche une ligne pour la modifier</small></div><div class="big">${fmt(c.dep)}</div></div>
+    ${groups || '<p class="empty">Aucune dépense pour l’instant.</p>'}
+    ${locked ? '' : `<button class="btn-ghost" data-act="add-exp">${ico('plus', 20)} Ajouter une dépense</button>`}</section>`;
+}
+
+function monthView() {
+  const k = vk;
+  const last = Object.values(S.periods).reduce((a, P) => Math.max(a, P.done ? P.done.at : 0, ...P.moves.map(m => m.at || 0)), 0);
+  const needBackup = last > (S.settings.lastBackup || 0);
+  let pending = null;
+  for (let q = first(); q < curKey(); q = shiftKey(q, 1)) { if (!getP(q).done) { pending = q; break; } }
+  return `${pending && pending !== k ? `<div class="note">${cap(mName(pending))} est terminé, tu peux faire le calcul. <button class="link" data-act="goto" data-key="${pending}">Voir ${mName(pending)}</button></div>` : ''}
+    ${!storageOK ? '<p class="note">Aperçu : tes saisies ne sont pas gardées ici. Dans l’app installée, elles le sont.</p>' : ''}
+    ${needBackup ? '<div class="note">Pense à faire ta sauvegarde, c’est ce qui protège tes chiffres si le téléphone change. <button class="link" data-act="backup">Sauvegarder</button></div>' : ''}
+    <div class="mbar">
+      <button class="rb" data-act="prev" aria-label="Mois précédent" aria-disabled="${k <= minKey()}">${ico('left', 22, 3)}</button>
+      <div class="mt"><b>${cap(mName(k))} ${k.split('-')[0]}${isHist(k) ? '<span class="badge">historique</span>' : ''}</b><small>${rangeTxt(k)}</small></div>
+      <button class="rb" data-act="next" aria-label="Mois suivant" aria-disabled="${k >= curKey()}">${ico('right', 22, 3)}</button>
+    </div>
+    ${heroHtml(k)}${rentreesHtml(k)}${depensesHtml(k)}`;
+}
+
+/* ---------- Écran « Ma tirelire » ---------- */
+function jarView() {
+  const bal = balance(), goal = Math.max(1, S.settings.goal);
+  const lvl = bal <= 0 ? 0 : Math.min(1, Math.max(0.05, bal / goal));
+  const pct = Math.max(0, Math.min(100, Math.round(bal / goal * 100)));
+  const rows = Object.entries(S.periods).filter(([k, P]) => !isHist(k) && (P.done || P.moves.length)).sort((a, b) => (a[0] < b[0] ? 1 : -1));
+  const taken = rows.filter(([, P]) => P.done && movedOf(P) < 0);
+  const avg = taken.length ? r2(taken.reduce((a, [, P]) => a - movedOf(P), 0) / taken.length) : 0;
+  const cover = avg > 0 && bal > 0 ? Math.floor(bal / avg) : null;
+  return `<h1 class="page-title">Ma tirelire</h1>
+    <p class="lead">C’est ton livret A : il se remplit les bons mois et dépanne les mois justes.</p>
+    <section class="card"><div class="jarbox">${jarSvg(lvl)}<div>
+      <div class="bal-l">Dans la tirelire</div><div class="bal${bal < 0 ? ' neg' : ''}">${fmt(bal)}</div>
+      <div class="bar" role="img" aria-label="${pct} % de l’objectif"><i style="width:${pct}%"></i></div>
+      <div class="meta">Objectif : ${fmt(goal)} (${pct} %)</div></div></div>
+      ${cover != null ? `<p class="tip">Les mois justes te coûtent en moyenne ${fmt(avg)}. À ce rythme, la tirelire tient ${cover} mois.</p>` : ''}
+      <button class="btn-main" data-act="fix-balance">${S.settings.set ? 'Corriger mon solde' : 'Dire combien il y a sur mon livret A'}</button></section>
+    <section class="card"><div class="sec-h"><h2>Mouvements par mois</h2></div>
+      <div>${rows.length ? rows.map(([k, P]) => { const d = movedOf(P); return `<div class="hrow2"><div class="nm"><b>${cap(mName(k))} ${k.split('-')[0]}${P.done ? '' : '<span class="badge">en cours</span>'}</b><small>${rangeTxt(k)}</small></div><b class="am ${d >= 0 ? 'plus' : 'minus'}">${d >= 0 ? '+' : '−'}${fmt(Math.abs(d))}</b></div>`; }).join('')
+        : '<p class="empty">Rien pour l’instant. Quand tu notes un dépôt ou un retrait, il apparaît ici et la tirelire se met à jour toute seule.</p>'}</div></section>`;
+}
+
+/* ---------- Écran « Réglages » ---------- */
+function settingsView() {
+  const rl = (r, inc) => `<div class="hrow2"><div class="nm"><b>${esc(r.name)}</b><small>${inc ? 'revenu' : esc(CATS[r.cat].label)}, depuis ${mName(ruleFrom(r))}${r.to ? `, jusqu’à ${mName(r.to)}` : ''}</small></div><b class="am">${fmt(ruleAmount(r, r.to || curKey()))}</b></div>`;
+  return `<h1 class="page-title">Réglages</h1>
+    <p class="lead">Suivi commencé en ${mName(first())} (${rangeTxt(first())}).</p>
+    <section class="card">
+      <div class="setline"><label for="s-min">Mon minimum libre chaque mois<small>Sous ce montant, la tirelire complète.</small></label><input class="nin" id="s-min" inputmode="decimal" data-setting="min" value="${toField(S.settings.min)}"></div>
+      <div class="setline"><label for="s-goal">Objectif de la tirelire<small>Pour voir où tu en es.</small></label><input class="nin" id="s-goal" inputmode="decimal" data-setting="goal" value="${toField(S.settings.goal)}"></div></section>
+    <section class="card"><div class="sec-h"><div><h2>Mes clients</h2><small>Touche un nom pour le changer.</small></div></div>
+      <div>${sortedClients().map(c => `<div class="hrow2"><button class="pay" data-act="rename-client" data-id="${c.id}"><span class="av" style="background:${PAL[hash(c.name) % PAL.length]}">${esc(initials(c.name))}</span><span class="nm"><b>${esc(c.name)}</b></span></button><button class="cx" data-act="client-del-ask" data-id="${c.id}" aria-label="Supprimer ${esc(c.name)}">${ico('x', 18, 3)}</button></div>`).join('') || '<p class="empty">Aucun client pour l’instant.</p>'}</div>
+      <button class="btn-ghost" style="margin-top:0" data-act="client-add-set">${ico('plus', 20)} Ajouter un client</button></section>
+    <section class="card"><div class="sec-h"><div><h2>Dépenses et revenus automatiques</h2><small>Pour les modifier, touche la ligne dans « Ce mois-ci ».</small></div></div>
+      <div>${S.rules.inc.map(r => rl(r, true)).join('')}${S.rules.exp.map(r => rl(r, false)).join('') || ''}${!S.rules.inc.length && !S.rules.exp.length ? '<p class="empty">Aucune pour l’instant.</p>' : ''}</div></section>
+    <section class="card"><button class="btn-ghost" style="margin-top:0" data-act="backup">Sauvegarder ou restaurer</button><button class="btn-ghost" data-act="reset">Tout effacer</button></section>
+    <p class="foot">Ma tirelire. Tes chiffres restent sur ce téléphone.</p>`;
+}
+
+/* ---------- Affichage ---------- */
+const TABS = [['month', 'cal', 'Ce mois-ci'], ['jar', 'jar', 'Ma tirelire'], ['settings', 'gear', 'Réglages']];
+function render() {
+  const nav = $('.tabs');
+  if (!S.settings.started) { $('#app').innerHTML = welcomeView(); nav.style.display = 'none'; return; }
+  nav.style.display = '';
+  clampVk();
+  $('#app').innerHTML = view === 'month' ? monthView() : view === 'jar' ? jarView() : settingsView();
+  $('#tabs').innerHTML = TABS.map(([key, ic, l]) => `<button class="tab" data-act="tab" data-tab="${key}"${key === view ? ' aria-current="page"' : ''}>${ico(ic, 22, 2.4)}${l}</button>`).join('');
+}
+
+/* ---------- Fenêtres du bas ---------- */
+function closeSheet() { const s = $('.sheet-wrap'); if (s) s.remove(); ps = null; }
+function openSheet(title, body, noFocus) {
+  closeSheet();
+  const el = document.createElement('div');
+  el.className = 'sheet-wrap';
+  el.innerHTML = `<div class="scrim" data-act="close-sheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="grab"></div><h2>${esc(title)}</h2>${body}</div>`;
+  document.body.appendChild(el);
+  const f = noFocus ? null : el.querySelector('input:not([type=checkbox]):not([type=date]):not([readonly])'); if (f) f.focus();
+  return el;
+}
+let toastTimer;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2400); }
+function burst() {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cols = ['#FFD84D', '#35C9A8', '#FF8FA3', '#FF9F43', '#B8A8FF'];
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('span'); s.className = 'pop';
+    s.style.setProperty('--c', cols[i % cols.length]);
+    s.style.setProperty('--dx', (Math.random() * 320 - 160) + 'px');
+    s.style.setProperty('--dy', -(120 + Math.random() * 220) + 'px');
+    document.body.appendChild(s); s.addEventListener('animationend', () => s.remove());
+  }
+}
+const arm = (btn, label) => { if (btn.dataset.armed) return true; btn.dataset.armed = '1'; btn.textContent = label; return false; };
+const catChips = cat => `<div class="chips" role="group" aria-label="Catégorie">${Object.entries(CATS).map(([key, v]) => `<button class="chip" data-act="cat" data-cat="${key}" aria-pressed="${key === cat}">${v.label}</button>`).join('')}</div>`;
+
+// Un paiement ou une dépense datée va dans la période qui contient sa date. Le passé est permis, pas le futur.
+function dateHint(dateStr, what) {
+  if (!dateStr) return { ok:false, text:'Choisis une date.' };
+  if (dateStr > todayStr()) return { ok:false, text:'Cette date est dans le futur.' };
+  if (dateStr < minDate()) return { ok:false, text:`Cette date est trop ancienne (jusqu’à ${MAX_BACK} mois avant ton début).` };
+  const kk = periodOf(dateStr);
+  if (getP(kk).done) return { ok:false, text:`${cap(mName(kk))} est déjà validé. Annule sa validation pour y ajouter ${what}.` };
+  return { ok:true, text:`${cap(what)} ira dans ${cap(mName(kk))} (${rangeTxt(kk)})${isHist(kk) ? ', avant ton début : pour mémoire seulement' : ''}.` };
+}
+const payHint = d => { const h = dateHint(d, 'ce paiement'); if (h.ok) h.text = h.text.replace(/^Ce paiement/, 'Ce paiement'); return h; };
+function monthOptions(sel) {
+  const hi = curKey(), lo = shiftKey(first(), -MAX_BACK), out = [];
+  for (let q = hi; q >= lo; q = shiftKey(q, -1)) out.push(`<option value="${q}"${q === sel ? ' selected' : ''}>${cap(mName(q))} ${q.split('-')[0]}${q === hi ? ' (ce mois-ci)' : ''}</option>`);
+  if (sel < lo) out.push(`<option value="${sel}" selected>${cap(mName(sel))} ${sel.split('-')[0]}</option>`);
+  return out.join('');
+}
+function bindDateHint(el, what) {
+  const upd = () => { const h = dateHint($('#f-date', el).value, what); const x = $('#f-hint', el); x.textContent = h.text; x.style.color = h.ok ? '' : 'var(--minus)'; };
+  $('#f-date', el).addEventListener('input', upd); $('#f-date', el).addEventListener('change', upd); upd();
+}
+
+function clientAreaHtml() {
+  const list = sortedClients();
+  if (ps.confirm) {
+    const c = S.clients.find(x => x.id === ps.confirm);
+    if (c) return `<div class="confirm" role="alertdialog" aria-label="Confirmer la suppression"><p><b>Êtes-vous sûr de supprimer «\u00a0${esc(c.name)}\u00a0»\u00a0?</b></p><p class="hint">Ses anciens paiements restent dans l’historique.</p>
+      <div class="two"><button class="btn-danger" data-act="cl-del-yes">Oui, supprimer</button><button class="btn-ghost" data-act="cl-del-no">Non, je garde</button></div></div>`;
+  }
+  const tiles = list.map(c => { const on = ps.sel === c.id; return `<div class="ctile${on ? ' on' : ''}"><button class="cbtn" data-act="sel-client" data-id="${c.id}" aria-pressed="${on}">
+      <span class="av" style="background:${PAL[hash(c.name) % PAL.length]}">${esc(initials(c.name))}</span><span class="cn">${esc(c.name)}</span>${on ? ico('check', 22, 3) : ''}</button>
+      <button class="cx" data-act="cl-del" data-id="${c.id}" aria-label="Supprimer ${esc(c.name)}">${ico('x', 18, 3)}</button></div>`; }).join('');
+  const oth = ps.sel === 'other';
+  const other = `<button class="ctile sp${oth ? ' on' : ''}" data-act="sel-other" aria-pressed="${oth}"><span class="av alt">${ico('star', 20, 2.4)}</span><span class="cn">Autre chose</span>${oth ? ico('check', 22, 3) : ''}</button>`;
+  const add = ps.adding
+    ? `<div class="addcl"><input type="text" id="f-newcl" maxlength="40" autocomplete="off" placeholder="Nom du client" aria-label="Nom du nouveau client"><p class="err" id="f-newerr"></p><button class="btn-main" data-act="cl-add-save">Ajouter ce client</button><button class="link" data-act="cl-add-cancel">Annuler</button></div>`
+    : `<button class="ctile sp" data-act="cl-add-open"><span class="av alt">${ico('plus', 20, 3)}</span><span class="cn">Ajouter un client</span></button>`;
+  const otherField = oth ? `<label class="fld">Précise le nom<input type="text" id="f-other" maxlength="40" autocomplete="off" placeholder="Ex. Remboursement" value="${esc(ps.other)}"></label>` : '';
+  return `${list.length ? `<div class="clist" role="group" aria-label="Mes clients">${tiles}</div>` : ''}<div class="cspecial">${other}${add}</div>${otherField}`;
+}
+const refreshClients = () => { const a = $('#cl-area'); if (a) a.innerHTML = clientAreaHtml(); };
+function payForm(p) {
+  return `<div class="fld-l">Qui t’a payée ?</div><div id="cl-area">${clientAreaHtml()}</div>
+    <label class="fld">Montant reçu<input id="f-amt" inputmode="decimal" autocomplete="off" placeholder="0" value="${p ? toField(p.amount) : ''}"></label>
+    <label class="fld">Date de réception<input type="date" id="f-date" value="${p ? p.date : todayStr()}" max="${todayStr()}" min="${minDate()}"></label>
+    <p class="hint" id="f-hint"></p><p class="err" id="f-err"></p>`;
+}
+function openPay(p, pre) {
+  const st = { sel:null, other:'', confirm:null, adding:false };
+  ps = st;
+  if (p) { const c = p.clientId && S.clients.find(x => x.id === p.clientId); if (c) st.sel = c.id; else { st.sel = 'other'; st.other = p.name || ''; } }
+  else if (pre && pre.sel && S.clients.find(x => x.id === pre.sel)) st.sel = pre.sel;
+  const el = openSheet(p ? 'Modifier ce paiement' : 'J’ai reçu un paiement',
+    payForm(p) + `<button class="btn-main" data-act="pay-save">${p ? 'Enregistrer' : 'Ajouter'}</button>${p ? '<button class="btn-danger" data-act="pay-del">Supprimer ce paiement</button>' : ''}`, !(pre && pre.sel));
+  ps = st;   // openSheet remet l'état à zéro en fermant l'éventuelle fenêtre précédente : on le rétablit
+  el.dataset.id = p ? p.id : '';
+  bindDateHint(el, 'ce paiement');
+}
+
+function freqAreaHtml(freq, selFrom) {
+  return freq === 'once'
+    ? `<label class="fld">Date de la dépense<input type="date" id="f-date" value="${todayStr()}" max="${todayStr()}" min="${minDate()}"></label><p class="hint" id="f-hint"></p>`
+    : `<label class="fld">À partir de<select id="f-from">${monthOptions(selFrom)}</select></label><p class="hint">Elle compte à partir de ce mois, jamais dans les mois d’avant.</p>`;
+}
+function openAddExp(isInc) {
+  const el = openSheet(isInc ? 'Ajouter un revenu fixe' : 'Ajouter une dépense', `
+    <label class="fld">Nom<input type="text" id="f-name" maxlength="40" autocomplete="off" placeholder="${isInc ? 'Ex. Allocation' : 'Ex. Courses'}"></label>
+    <label class="fld">Montant<input id="f-amt" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+    ${isInc ? '' : `<div class="fld">Catégorie${catChips('courante')}</div>
+    <div class="fld">Cette dépense revient<div class="chips"><button class="chip" data-act="freq" data-freq="rule" aria-pressed="true">Chaque mois</button><button class="chip" data-act="freq" data-freq="once" aria-pressed="false">Une seule fois</button></div></div>`}
+    <div id="freq-area">${freqAreaHtml('rule', vk)}</div>
+    <p class="err" id="f-err"></p><button class="btn-main" data-act="exp-add">Ajouter</button>`);
+  Object.assign(el.dataset, { inc: isInc ? '1' : '', cat: 'courante', freq: 'rule' });
+}
+function openExp(id, isRule, isInc) {
+  const k = vk; let it, rule = null;
+  if (isRule) {
+    rule = (isInc ? S.rules.inc : S.rules.exp).find(x => x.id === id); if (!rule) return;
+    const L = lines(k); it = (isInc ? L.inc : L.exp).find(x => x.id === id); if (!it) return;
+  } else { it = S.oneoffs.find(x => x.id === id); if (!it) return; }
+  const el = openSheet(isInc ? 'Modifier ce revenu fixe' : 'Modifier cette dépense', `
+    <label class="fld">Nom<input type="text" id="f-name" maxlength="40" autocomplete="off" value="${esc(it.name)}"></label>
+    <label class="fld">Montant<input id="f-amt" inputmode="decimal" autocomplete="off" value="${toField(it.amount)}"></label>
+    ${isInc ? '' : `<div class="fld">Catégorie${catChips(it.cat)}</div>`}
+    ${isRule ? `<div class="fld">Ce montant compte pour<div class="chips"><button class="chip" data-act="scope" data-scope="this" aria-pressed="true">Ce mois-ci seulement</button><button class="chip" data-act="scope" data-scope="future" aria-pressed="false">Ce mois-ci et les suivants</button></div></div>
+      <label class="fld">Compte à partir de<select id="f-from">${monthOptions(ruleFrom(rule))}</select></label>`
+      : `<label class="fld">Date de la dépense<input type="date" id="f-date" value="${it.date}" max="${todayStr()}" min="${minDate()}"></label><p class="hint" id="f-hint"></p>`}
+    <p class="err" id="f-err"></p>
+    <button class="btn-main" data-act="exp-save">Enregistrer</button>
+    ${isRule ? '<button class="btn-ghost" data-act="exp-remove">Retirer de ce mois-ci</button><button class="btn-danger" data-act="exp-stop">Arrêter à partir de ce mois-ci</button>' : '<button class="btn-danger" data-act="exp-del">Supprimer cette dépense</button>'}`);
+  Object.assign(el.dataset, { id, rule: isRule ? '1' : '', inc: isInc ? '1' : '', cat: it.cat || '', scope: 'this' });
+  if (!isRule) bindDateHint(el, 'cette dépense');
+}
+function backupSheet() {
+  openSheet('Sauvegarde', `<p>Copie ce texte ou enregistre-le dans un fichier, puis garde-le (message à toi-même, Drive). Il permet de tout retrouver si le téléphone change.</p>
+    <label class="fld">Ma sauvegarde<textarea id="bk" readonly>${esc(JSON.stringify(S))}</textarea></label>
+    <button class="btn-main" data-act="copy">Copier le texte</button>
+    <button class="btn-ghost" data-act="dl">Enregistrer un fichier</button>
+    ${navigator.share ? '<button class="btn-ghost" data-act="share">Envoyer…</button>' : ''}
+    <label class="fld">Pour restaurer, colle une sauvegarde ici<textarea id="bk-in" placeholder="Colle le texte ici"></textarea></label>
+    <p class="err" id="f-err"></p><button class="btn-ghost" data-act="import">Restaurer</button>`);
+}
+const markBackup = () => { S.settings.lastBackup = Date.now(); persist(); };
+
+/* ---------- Actions ---------- */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act, id = b.dataset.id, wrap = b.closest('.sheet-wrap');
+  const k = vk, P = () => getP(vk);
+  const err = t => { const x = $('#f-err', wrap); if (x) x.textContent = t; };
+
+  switch (act) {
+    case 'tab': view = b.dataset.tab; render(); window.scrollTo(0, 0); break;
+    case 'prev': if (vk > minKey()) { vk = shiftKey(vk, -1); render(); } break;
+    case 'next': if (vk < curKey()) { vk = shiftKey(vk, 1); render(); } break;
+    case 'close-sheet': closeSheet(); break;
+    case 'goto': vk = b.dataset.key; render(); window.scrollTo(0, 0); break;
+    case 'locked': toast('Ce mois est validé. Annule la validation pour le modifier.'); break;
+    case 'reveal': P().revealed = true; persist(); render(); break;
+
+    // tirelire : chaque dépôt ou retrait réel est noté ici
+    case 'move': {
+      const m = tirelireModel(k); if (isHist(k) || m.P.done || m.rem === 0) break;
+      m.P.moves.push({ id:uid(), amount:m.rem, at:Date.now() });
+      if (ended(k) && m.P.revealed && canClose(k)) m.P.done = { at:Date.now(), snap:clone(liveLines(k)) };
+      persist(); render(); toast('Noté dans ta tirelire'); if (m.rem > 0) burst();
+      break;
+    }
+    case 'undo-move': if (P().moves.length && !P().done) { P().moves.pop(); persist(); render(); toast('Dernier mouvement annulé'); } break;
+    case 'validate': {
+      const m = tirelireModel(k); if (!canClose(k) || m.rem !== 0 || m.P.done) break;
+      m.P.done = { at:Date.now(), snap:clone(liveLines(k)) };
+      persist(); render(); toast('Mois validé');
+      break;
+    }
+    case 'undo': if (canUndo(k)) { P().done = null; persist(); render(); toast('Validation annulée'); } break;
+
+    // première ouverture
+    case 'start': {
+      const bal = parseAmount(($('#w-bal') || {}).value);
+      S.settings.startKey = periodOf(todayStr()); S.settings.started = true;
+      if (bal != null && ($('#w-bal').value || '').trim() !== '') { S.settings.start = bal; S.settings.set = true; }
+      persist(); view = 'month'; vk = curKey(); render();
+      break;
+    }
+    case 'config-open':
+      openSheet('Configuration de départ', `<p>Colle ici le texte de configuration qu’on t’a donné. Il remplit tes dépenses et tes clients.</p>
+        <label class="fld">Texte de configuration<textarea id="bk-in" placeholder="Colle le texte ici"></textarea></label>
+        <p class="err" id="f-err"></p><button class="btn-main" data-act="config-apply">Appliquer</button>`);
+      break;
+    case 'config-apply': {
+      let c = null; try { c = JSON.parse($('#bk-in', wrap).value.trim()); } catch (x) {}
+      if (!c || c.config !== true) { err('Ce texte n’est pas une configuration valide.'); break; }
+      const bal0 = parseAmount(($('#w-bal') || {}).value);   // solde du livret A éventuellement déjà tapé sur l'écran de bienvenue
+      S = applyConfig(c);
+      if (bal0 != null && ($('#w-bal').value || '').trim() !== '') { S.settings.start = bal0; S.settings.set = true; }
+      persist(); closeSheet(); view = 'month'; vk = curKey(); render(); toast('Configuration appliquée');
+      break;
+    }
+
+    // paiements et clients
+    case 'add-pay': openPay(null, b.dataset.client ? { sel:b.dataset.client } : null); break;
+    case 'edit-pay': { const p = S.payments.find(x => x.id === id); if (p) openPay(p); break; }
+    case 'toggle-clients': clientsOpen = !clientsOpen; render(); break;
+    case 'sel-client': ps.sel = id; ps.adding = false; ps.confirm = null; refreshClients(); $('#f-amt', wrap).focus(); break;
+    case 'sel-other': ps.sel = 'other'; ps.adding = false; ps.confirm = null; refreshClients(); { const f = $('#f-other', wrap); if (f) f.focus(); } break;
+    case 'cl-del': ps.confirm = id; refreshClients(); break;
+    case 'cl-del-no': ps.confirm = null; refreshClients(); break;
+    case 'cl-del-yes': { const gone = ps.confirm; deleteClient(gone); if (ps.sel === gone) ps.sel = null; ps.confirm = null; refreshClients(); toast('Client supprimé'); break; }
+    case 'cl-add-open': ps.adding = true; ps.confirm = null; refreshClients(); { const f = $('#f-newcl', wrap); if (f) f.focus(); } break;
+    case 'cl-add-cancel': ps.adding = false; refreshClients(); break;
+    case 'cl-add-save': {
+      const r = addClient($('#f-newcl', wrap).value);
+      if (!r.ok) { $('#f-newerr', wrap).textContent = r.error; break; }
+      ps.sel = r.client.id; ps.adding = false; refreshClients();
+      toast(r.existing ? 'Ce client existait déjà, je l’ai sélectionné' : 'Client ajouté'); $('#f-amt', wrap).focus();
+      break;
+    }
+    case 'pay-save': {
+      const amount = parseAmount($('#f-amt', wrap).value), date = $('#f-date', wrap).value;
+      if (!ps.sel) { err('Choisis qui t’a payée, ou « Autre chose ».'); break; }
+      let name, clientId = null;
+      if (ps.sel === 'other') { name = (ps.other || '').trim(); if (!name) { err('Précise le nom.'); break; } }
+      else { const c = S.clients.find(x => x.id === ps.sel); if (!c) { err('Choisis qui t’a payée.'); break; } name = c.name; clientId = c.id; }
+      if (!amount) { err('Écris un montant, par exemple 85 ou 85,50.'); break; }
+      const h = dateHint(date, 'ce paiement'); if (!h.ok) { err(h.text); break; }
+      const editId = wrap.dataset.id;
+      if (editId) {
+        const p = S.payments.find(x => x.id === editId); if (!p) break;
+        if (getP(periodOf(p.date)).done) { err('Le mois de ce paiement est validé. Annule la validation pour le modifier.'); break; }
+        Object.assign(p, { amount, name, date, clientId });
+      } else S.payments.push({ id:uid(), clientId, name, amount, date });
+      const target = periodOf(date), moved = target !== vk; vk = target;
+      persist(); closeSheet(); render();
+      toast(moved ? `Rangé dans ${cap(mName(target))}` : editId ? 'Paiement modifié' : 'Paiement ajouté');
+      break;
+    }
+    case 'pay-del': {
+      if (!arm(b, 'Oui, supprimer')) break;
+      const p = S.payments.find(x => x.id === wrap.dataset.id);
+      if (p && getP(periodOf(p.date)).done) { err('Le mois de ce paiement est validé. Annule la validation pour le modifier.'); break; }
+      S.payments = S.payments.filter(x => x.id !== wrap.dataset.id);
+      persist(); closeSheet(); render(); toast('Paiement supprimé');
+      break;
+    }
+
+    // dépenses et revenus fixes
+    case 'add-exp': openAddExp(!!b.dataset.inc); break;
+    case 'edit-exp': openExp(id, b.dataset.rule === '1', false); break;
+    case 'edit-rule': openExp(id, true, true); break;
+    case 'cat': wrap.dataset.cat = b.dataset.cat; wrap.querySelectorAll('[data-act=cat]').forEach(c => c.setAttribute('aria-pressed', String(c === b))); break;
+    case 'scope': wrap.dataset.scope = b.dataset.scope; wrap.querySelectorAll('[data-act=scope]').forEach(c => c.setAttribute('aria-pressed', String(c === b))); break;
+    case 'freq':
+      wrap.dataset.freq = b.dataset.freq;
+      wrap.querySelectorAll('[data-act=freq]').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+      $('#freq-area', wrap).innerHTML = freqAreaHtml(b.dataset.freq, vk);
+      if (b.dataset.freq === 'once') bindDateHint(wrap, 'cette dépense');
+      break;
+    case 'exp-add': {
+      const name = cleanName($('#f-name', wrap).value), amount = parseAmount($('#f-amt', wrap).value) ?? 0, isInc = !!wrap.dataset.inc;
+      if (!name) { err('Donne un nom à cette ligne.'); break; }
+      const freq = isInc ? 'rule' : wrap.dataset.freq;
+      if (freq === 'rule') {
+        const from = $('#f-from', wrap).value;
+        (isInc ? S.rules.inc : S.rules.exp).push({ id:uid(), name, cat:wrap.dataset.cat, versions:[{ from, amount }], to:null });
+      } else {
+        const date = $('#f-date', wrap).value, h = dateHint(date, 'cette dépense'); if (!h.ok) { err(h.text); break; }
+        S.oneoffs.push({ id:uid(), name, amount, cat:wrap.dataset.cat, date }); vk = periodOf(date);
+      }
+      persist(); closeSheet(); render(); toast('Ajouté');
+      break;
+    }
+    case 'exp-save': {
+      const name = cleanName($('#f-name', wrap).value), amount = parseAmount($('#f-amt', wrap).value);
+      if (!name) { err('Donne un nom à cette ligne.'); break; }
+      if (amount == null) { err('Écris un montant, par exemple 58 ou 58,50.'); break; }
+      const isRule = !!wrap.dataset.rule, isInc = !!wrap.dataset.inc, cat = wrap.dataset.cat, scope = wrap.dataset.scope;
+      if (isRule) {
+        const r = (isInc ? S.rules.inc : S.rules.exp).find(x => x.id === wrap.dataset.id); if (!r) break;
+        const newFrom = $('#f-from', wrap).value, oldFrom = ruleFrom(r);
+        if (newFrom !== oldFrom) {
+          if (newFrom > k) { err('Le début ne peut pas être après le mois affiché.'); break; }
+          if (r.to && newFrom > r.to) { err('Le début doit être avant la fin de cette ligne.'); break; }
+          if (newFrom < oldFrom) r.versions[0].from = newFrom;
+          else { const at = ruleAmount(r, newFrom); r.versions = r.versions.filter(v => v.from > newFrom); r.versions.unshift({ from:newFrom, amount:at }); }
+        }
+        r.name = name; if (!isInc) r.cat = cat;
+        const o = P().ov[r.id] || (P().ov[r.id] = {});
+        if (scope === 'future') {
+          r.versions = r.versions.filter(v => v.from < k); r.versions.push({ from:k, amount }); r.versions.sort((a, c) => (a.from < c.from ? -1 : 1));
+          delete o.amount;
+        } else if (amount === ruleAmount(r, k)) delete o.amount; else o.amount = amount;
+      } else {
+        const x = S.oneoffs.find(q => q.id === wrap.dataset.id); if (!x) break;
+        const date = $('#f-date', wrap).value, h = dateHint(date, 'cette dépense'); if (!h.ok) { err(h.text); break; }
+        Object.assign(x, { name, amount, cat, date }); vk = periodOf(date);
+      }
+      persist(); closeSheet(); render(); toast('Enregistré');
+      break;
+    }
+    case 'exp-remove': {
+      const o = P().ov[wrap.dataset.id] || (P().ov[wrap.dataset.id] = {}); o.removed = true;
+      persist(); closeSheet(); render(); toast('Retiré de ce mois-ci');
+      break;
+    }
+    case 'exp-stop': {
+      if (!arm(b, 'Oui, arrêter à partir de ce mois')) break;
+      const isInc = !!wrap.dataset.inc, list = isInc ? S.rules.inc : S.rules.exp, r = list.find(x => x.id === wrap.dataset.id); if (!r) break;
+      const last = shiftKey(k, -1);
+      if (last < ruleFrom(r)) list.splice(list.indexOf(r), 1); else r.to = last;
+      persist(); closeSheet(); render(); toast('Arrêté, le passé reste inchangé');
+      break;
+    }
+    case 'exp-del': {
+      if (!arm(b, 'Oui, supprimer')) break;
+      S.oneoffs = S.oneoffs.filter(x => x.id !== wrap.dataset.id);
+      persist(); closeSheet(); render(); toast('Dépense supprimée');
+      break;
+    }
+
+    // solde, sauvegarde, réglages
+    case 'fix-balance':
+      openSheet('Combien y a-t-il sur ton livret A ?', `<p>Regarde ton solde dans ton appli bancaire et écris-le ici. Ensuite la tirelire se met à jour toute seule à chaque dépôt ou retrait que tu notes.</p>
+        <label class="fld">Solde aujourd’hui<input id="f-bal" inputmode="decimal" autocomplete="off" value="${toField(balance())}"></label>
+        <p class="err" id="f-err"></p><button class="btn-main" data-act="bal-save">Enregistrer</button>`);
+      break;
+    case 'bal-save': {
+      const t = parseAmount($('#f-bal', wrap).value);
+      if (t == null) { err('Écris un montant, par exemple 850 ou 850,50.'); break; }
+      S.settings.start = r2(t - r2(Object.values(S.periods).reduce((a, q) => a + movedOf(q), 0))); S.settings.set = true;
+      persist(); closeSheet(); render(); toast('Solde enregistré');
+      break;
+    }
+    case 'rename-client': {
+      const c = S.clients.find(x => x.id === id); if (!c) break;
+      openSheet('Changer le nom', `<label class="fld">Nom du client<input type="text" id="f-name" maxlength="40" autocomplete="off" value="${esc(c.name)}"></label><p class="err" id="f-err"></p><button class="btn-main" data-act="client-rename-go" data-id="${id}">Enregistrer</button>`);
+      break;
+    }
+    case 'client-rename-go': { const r = renameClient(id, $('#f-name', wrap).value); if (!r.ok) { err(r.error); break; } closeSheet(); render(); toast('Nom modifié'); break; }
+    case 'client-del-ask': {
+      const c = S.clients.find(x => x.id === id); if (!c) break;
+      openSheet('Supprimer ce client ?', `<p><b>Êtes-vous sûr de supprimer «\u00a0${esc(c.name)}\u00a0»\u00a0?</b></p><p class="hint">Ses anciens paiements restent dans l’historique.</p><button class="btn-danger" data-act="client-del-go" data-id="${id}">Oui, supprimer</button><button class="btn-ghost" data-act="close-sheet">Non, je garde</button>`);
+      break;
+    }
+    case 'client-del-go': deleteClient(id); closeSheet(); render(); toast('Client supprimé'); break;
+    case 'client-add-set':
+      openSheet('Ajouter un client', '<label class="fld">Nom du client<input type="text" id="f-name" maxlength="40" autocomplete="off" placeholder="Nom du client"></label><p class="err" id="f-err"></p><button class="btn-main" data-act="client-add-go">Ajouter</button>');
+      break;
+    case 'client-add-go': { const r = addClient($('#f-name', wrap).value); if (!r.ok) { err(r.error); break; } closeSheet(); render(); toast(r.existing ? 'Ce client existe déjà' : 'Client ajouté'); break; }
+    case 'backup': backupSheet(); break;
+    case 'copy': {
+      const ta = $('#bk', wrap), text = ta.value, ok = () => { markBackup(); toast('Copié'); };
+      const fb = () => { ta.select(); try { document.execCommand('copy'); ok(); } catch (x) { toast('Sélectionne le texte et copie-le'); } };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fb); else fb();
+      break;
+    }
+    case 'dl': {
+      try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([$('#bk', wrap).value], { type:'text/plain' }));
+        a.download = 'ma-tirelire-sauvegarde-' + todayStr() + '.txt'; document.body.appendChild(a); a.click(); a.remove();
+        markBackup(); toast('Fichier enregistré');
+      } catch (x) { toast('Impossible d’enregistrer ici. Utilise « Copier le texte ».'); }
+      break;
+    }
+    case 'share': navigator.share({ title:'Sauvegarde Ma tirelire', text:$('#bk', wrap).value }).then(markBackup).catch(() => {}); break;
+    case 'import': {
+      let d = null; try { d = JSON.parse($('#bk-in', wrap).value.trim()); } catch (x) {}
+      if (d && d.config === true) { if (!arm(b, 'Oui, remplacer mes données')) break; S = applyConfig(d); persist(); closeSheet(); view = 'month'; vk = curKey(); render(); toast('Configuration appliquée'); break; }
+      d = d && migrate(d);
+      if (!validShape(d)) { err('Ce texte n’est pas une sauvegarde valide.'); break; }
+      if (!arm(b, 'Oui, remplacer mes données')) break;
+      d.settings = Object.assign(emptyData().settings, d.settings);
+      S = d; persist(); closeSheet(); view = 'month'; vk = curKey(); render(); toast('Données restaurées');
+      break;
+    }
+    case 'reset':
+      openSheet('Tout effacer ?', '<p>Tous tes mois, ta tirelire et tes réglages seront supprimés de ce téléphone. Pense à faire une sauvegarde avant.</p><button class="btn-danger" data-act="reset-go">Oui, tout effacer</button><button class="btn-ghost" data-act="close-sheet">Non, je garde tout</button>');
+      break;
+    case 'reset-go': S = DEMO ? demoData() : emptyData(); persist(); closeSheet(); view = 'month'; vk = curKey(); render(); toast('Tout est effacé'); break;
+    /*DEMOCASE:BEGIN*/
+    case 'demo-reset': S = demoData(); demoDate = '2026-10-24'; persist(); $('#demo-date').value = demoDate; view = 'month'; vk = curKey(); render(); toast('Exemple remis à zéro'); break;
+    case 'demo-first': S = emptyData(); persist(); view = 'month'; vk = curKey(); render(); break;
+    /*DEMOCASE:END*/
+  }
+});
+
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (t.matches('[data-setting]')) { S.settings[t.dataset.setting] = parseAmount(t.value) ?? 0; persist(); }
+  else if (t.id === 'f-other' && ps) ps.other = t.value;
+  /*DEMOIN:BEGIN*/
+  else if (t.id === 'demo-date' && t.value) { demoDate = t.value; if (!S.settings.started) S.settings.startKey = periodOf(demoDate); vk = curKey(); render(); }
+  /*DEMOIN:END*/
+});
+
+/* ---------- Démarrage ---------- */
+/*DEMOBAR:BEGIN*/
+if (DEMO) {
+  $('#demo').innerHTML = '<div><b>Aperçu avec des chiffres d’exemple.</b> Change la date du jour pour tester : à partir du 16 nov., le mois d’Octobre est terminé et le calcul apparaît. Ce bandeau n’existera pas dans la vraie app.<br><label>Date du jour <input type="date" id="demo-date" value="2026-10-24"></label><br><button class="link" data-act="demo-reset">Remettre l’exemple</button> <button class="link" data-act="demo-first">Simuler la première ouverture</button></div>';
+} else $('#demo').remove();
+/*DEMOBAR:END*/
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) {}
+render();
+// Quand elle rouvre l'app après un changement de jour (par exemple le 16), tout se remet à jour avec la date du téléphone.
+let lastDay = todayStr();
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  const t = todayStr(); if (t === lastDay) return;
+  const wasCurrent = vk === periodOf(lastDay) || vk === curKey();
+  lastDay = t; if (wasCurrent) vk = curKey(); render();
+});
+/*SW*/
+})();
+</script>
+</body>
+</html>
